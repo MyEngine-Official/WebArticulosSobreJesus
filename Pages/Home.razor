@@ -1,0 +1,464 @@
+@page "/"
+@inject NavigationManager Navigation
+
+<PageTitle>¿Quién es Jesús? - Explorando su Identidad</PageTitle>
+
+<div class="hero-section">
+    <div class="hero-overlay"></div>
+    <div class="container hero-content">
+        <div class="hero-text fade-in">
+            <h1 class="hero-title">¿Quién es Jesús?</h1>
+            <p class="hero-subtitle">Explorando la identidad, enseñanzas y legado de Jesús de Nazaret</p>
+            <div class="hero-buttons">
+                <button class="btn btn-primary btn-lg" @onclick="@(() => Navigation.NavigateTo("/articulos"))">
+                    <i class="bi bi-book"></i> Explorar Artículos
+                </button>
+                <button class="btn btn-outline-primary btn-lg" @onclick="ScrollToIntro">
+                    <i class="bi bi-arrow-down-circle"></i> Descubrir Más
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="hero-wave">
+        <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+            <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z"></path>
+        </svg>
+    </div>
+</div>
+
+<section id="intro" class="intro-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <div class="intro-content fade-in">
+                    <h2 class="section-title">Una Pregunta Fundamental</h2>
+                    <p class="lead">¿Quién es Jesús? Esta pregunta ha resonado a través de los siglos y continúa siendo central para millones de personas en todo el mundo.</p>
+                    <p>En este espacio exploramos su identidad, sus enseñanzas, su impacto histórico y el significado de su vida y mensaje, examinando cuidadosamente las Escrituras, la historia y diversas perspectivas teológicas.</p>
+                    <div class="feature-list">
+                        <div class="feature-item">
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span>Análisis bíblico e histórico</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span>Contexto cultural y teológico</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span>Estudio documentado y profundo</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="intro-image-wrapper fade-in">
+                    <div class="intro-image-card">
+                        <div class="card-decoration"></div>
+                        <h3 class="text-gradient">La Persona de Jesús</h3>
+                        <p class="text-muted">"Vosotros, ¿quién decís que soy yo?"</p>
+                        <p class="scripture-reference">- Marcos 8:29</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="topics-section">
+    <div class="container">
+        <h2 class="section-title text-center mb-5">Temas de Exploración</h2>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4">
+                <div class="topic-card">
+                    <div class="topic-icon topic-icon-primary">
+                        <i class="bi bi-person"></i>
+                    </div>
+                    <h3>Su Identidad</h3>
+                    <p>¿Quién afirmaba ser? Explorando sus propias declaraciones y cómo lo vieron sus contemporáneos.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="topic-card">
+                    <div class="topic-icon topic-icon-secondary">
+                        <i class="bi bi-chat-quote"></i>
+                    </div>
+                    <h3>Sus Enseñanzas</h3>
+                    <p>El mensaje revolucionario que transformó el pensamiento moral y espiritual de la humanidad.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="topic-card">
+                    <div class="topic-icon topic-icon-primary">
+                        <i class="bi bi-clock-history"></i>
+                    </div>
+                    <h3>Contexto Histórico</h3>
+                    <p>La Palestina del siglo I y el mundo en el que Jesús vivió y ministró.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="topic-card">
+                    <div class="topic-icon topic-icon-secondary">
+                        <i class="bi bi-heart"></i>
+                    </div>
+                    <h3>Su Misión</h3>
+                    <p>El propósito de su vida, muerte y resurrección según diversas perspectivas.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="topic-card">
+                    <div class="topic-icon topic-icon-primary">
+                        <i class="bi bi-people"></i>
+                    </div>
+                    <h3>Testimonio de Otros</h3>
+                    <p>Lo que dijeron de él sus discípulos, adversarios y testigos históricos.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="topic-card">
+                    <div class="topic-icon topic-icon-secondary">
+                        <i class="bi bi-globe"></i>
+                    </div>
+                    <h3>Impacto Universal</h3>
+                    <p>Cómo la figura de Jesús ha moldeado la historia, cultura y civilización.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="cta-section">
+    <div class="container">
+        <div class="cta-content">
+            <h2 class="text-white mb-4">Comienza tu Exploración</h2>
+            <p class="text-white mb-4">Descubre quién es Jesús a través del estudio, la reflexión y la evidencia histórica</p>
+            <button class="btn btn-lg btn-cta" 
+                    @onclick="@(() => Navigation.NavigateTo("/articulos"))">
+                <i class="bi bi-arrow-right-circle"></i> Ver Artículos
+            </button>
+        </div>
+    </div>
+</section>
+
+<style>
+    /* Hero Section - Gradiente Clásico */
+    .hero-section {
+        position: relative;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #6d120b 0%, #b02a29 50%, #113047 100%);
+        overflow: hidden;
+    }
+
+    .hero-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+            radial-gradient(circle at 20% 50%, rgba(251, 240, 216, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 80% 80%, rgba(115, 154, 185, 0.1) 0%, transparent 50%);
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        text-align: center;
+        color: var(--color-cream);
+    }
+
+    .hero-title {
+        font-size: clamp(3rem, 8vw, 6rem);
+        font-weight: 900;
+        margin-bottom: 1.5rem;
+        text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        letter-spacing: -2px;
+        color: var(--color-cream);
+        background: none;
+        -webkit-text-fill-color: var(--color-cream);
+    }
+
+    .hero-subtitle {
+        font-size: clamp(1.25rem, 3vw, 1.75rem);
+        font-weight: 300;
+        margin-bottom: 3rem;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+        color: var(--color-cream);
+    }
+
+    .hero-buttons {
+        display: flex;
+        gap: 1.5rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .hero-buttons .btn {
+        min-width: 200px;
+        padding: 1rem 2.5rem;
+        font-size: 1.125rem;
+        text-transform: none;
+        letter-spacing: 0.5px;
+    }
+
+    .hero-buttons .btn-outline-primary {
+        background: rgba(251, 240, 216, 0.15);
+        backdrop-filter: blur(10px);
+        border: 2px solid var(--color-cream);
+        color: var(--color-cream);
+    }
+
+    .hero-buttons .btn-outline-primary:hover {
+        background: var(--color-cream);
+        color: var(--color-primary-dark);
+    }
+
+    .hero-wave {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        overflow: hidden;
+        line-height: 0;
+    }
+
+    .hero-wave svg {
+        position: relative;
+        display: block;
+        width: calc(100% + 1.3px);
+        height: 80px;
+    }
+
+    .hero-wave path {
+        fill: var(--color-cream);
+    }
+
+    /* Intro Section */
+    .intro-section {
+        padding: 8rem 0;
+        background: var(--color-cream);
+    }
+
+    .section-title {
+        font-size: clamp(2rem, 5vw, 3rem);
+        font-weight: 800;
+        margin-bottom: 2rem;
+        background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .intro-content {
+        padding-right: 2rem;
+    }
+
+    .feature-list {
+        margin-top: 2rem;
+    }
+
+    .feature-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        font-size: 1.125rem;
+    }
+
+    .feature-item i {
+        color: var(--color-primary);
+        font-size: 1.5rem;
+    }
+
+    .intro-image-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .intro-image-card {
+        position: relative;
+        background: white;
+        padding: 3rem;
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-xl);
+        max-width: 400px;
+        width: 100%;
+        text-align: center;
+        border: 2px solid var(--color-cream-dark);
+    }
+
+    .card-decoration {
+        position: absolute;
+        top: -10px;
+        left: -10px;
+        right: -10px;
+        bottom: -10px;
+        background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+        border-radius: var(--radius-xl);
+        z-index: -1;
+        opacity: 0.1;
+    }
+
+    .scripture-reference {
+        font-style: italic;
+        color: var(--color-gray);
+        margin-top: 1rem;
+        font-size: 0.95rem;
+    }
+
+    /* Topics Section */
+    .topics-section {
+        padding: 8rem 0;
+        background: var(--color-off-white);
+    }
+
+    .topic-card {
+        background: white;
+        padding: 2.5rem;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        transition: all var(--transition-normal);
+        height: 100%;
+        text-align: center;
+        border-top: 4px solid transparent;
+        border: 1px solid var(--color-gray-light);
+    }
+
+    .topic-card:hover {
+        transform: translateY(-10px);
+        box-shadow: var(--shadow-xl);
+        border-top-color: var(--color-primary);
+    }
+
+    .topic-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        color: var(--color-cream);
+        font-size: 2rem;
+        box-shadow: var(--shadow-md);
+    }
+
+    .topic-icon-primary {
+        background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+    }
+
+    .topic-icon-secondary {
+        background: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-secondary-light) 100%);
+    }
+
+    .topic-card h3 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        color: var(--color-dark);
+    }
+
+    .topic-card p {
+        color: var(--color-gray);
+        line-height: 1.6;
+    }
+
+    /* CTA Section */
+    .cta-section {
+        padding: 6rem 0;
+        background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-secondary) 100%);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .cta-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+            radial-gradient(circle at 30% 50%, rgba(251, 240, 216, 0.08) 0%, transparent 50%),
+            radial-gradient(circle at 70% 80%, rgba(115, 154, 185, 0.08) 0%, transparent 50%);
+    }
+
+    .cta-content {
+        position: relative;
+        text-align: center;
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    .cta-content h2 {
+        font-size: clamp(2rem, 5vw, 3rem);
+        font-weight: 800;
+    }
+
+    .cta-content p {
+        font-size: 1.25rem;
+        opacity: 0.95;
+    }
+
+    .btn-cta {
+        background: var(--color-cream);
+        color: var(--color-primary-dark);
+        font-weight: 700;
+        border: 2px solid var(--color-cream);
+    }
+
+    .btn-cta:hover {
+        background: transparent;
+        color: var(--color-cream);
+        border-color: var(--color-cream);
+    }
+
+    /* Animations */
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .fade-in {
+        animation: fadeIn 0.8s ease-out;
+    }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .hero-section {
+            min-height: 80vh;
+            padding: 2rem 0;
+        }
+
+        .intro-section, .topics-section {
+            padding: 4rem 0;
+        }
+
+        .cta-section {
+            padding: 4rem 0;
+        }
+
+        .intro-content {
+            padding-right: 0;
+            margin-bottom: 2rem;
+        }
+    }
+</style>
+
+@code {
+    private async Task ScrollToIntro()
+    {
+        // Implementar scroll suave con JavaScript si es necesario
+    }
+}

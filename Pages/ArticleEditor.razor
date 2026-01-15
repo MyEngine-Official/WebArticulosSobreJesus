@@ -1,0 +1,307 @@
+@page "/articulos/crear"
+@page "/articulos/editar/{Id}"
+@using QuienEsJesus.Models
+@using QuienEsJesus.Services
+@using QuienEsJesus.Helpers
+@using Markdig
+@using Microsoft.JSInterop
+@inject ArticleService ArticleService
+@inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+
+@if (!BuildConfiguration.IsDebugMode)
+{
+    <PageTitle>No Disponible - ¿Quién es Jesús?</PageTitle>
+    <div class="container mt-4">
+        <div class="alert alert-warning">
+            <i class="bi bi-exclamation-triangle"></i> Esta función solo está disponible en modo desarrollo.
+        </div>
+        <button class="btn btn-primary" @onclick="@(() => Navigation.NavigateTo("/articulos"))">
+            <i class="bi bi-arrow-left"></i> Volver a Artículos
+        </button>
+    </div>
+}
+else
+{
+    <PageTitle>@(IsEditing ? "Editar" : "Crear") Artículo - ¿Quién es Jesús?</PageTitle>
+
+    <div class="container mt-4 fade-in">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>@(IsEditing ? "Editar" : "Crear") Artículo</h1>
+            <span class="badge badge-primary">
+                <i class="bi bi-code-slash"></i> Modo Debug
+            </span>
+        </div>
+
+        <EditForm Model="article" OnValidSubmit="HandleSubmit">
+            <DataAnnotationsValidator />
+
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="card mb-4 shadow-elegant">
+                        <div class="card-header">
+                            <h5 class="mb-0">Información del Artículo</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="titulo" class="form-label">Título *</label>
+                                <InputText id="titulo" class="form-control" @bind-Value="article.Titulo" 
+                                           placeholder="Título del artículo" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="descripcion" class="form-label">Descripción *</label>
+                                <InputTextArea id="descripcion" class="form-control" rows="3" 
+                                               @bind-Value="article.Descripcion" 
+                                               placeholder="Breve descripción del artículo" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Estado de Publicación</label>
+                                <div class="form-check form-switch">
+                                    <InputCheckbox class="form-check-input" id="esPublico" 
+                                                   @bind-Value="article.EsPublico" />
+                                    <label class="form-check-label" for="esPublico">
+                                        @if (article.EsPublico)
+                                        {
+                                            <i class="bi bi-eye"></i>
+                                            <strong>Público</strong>
+
+                                            <text> - Visible en producción </text>
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-eye-slash"></i>
+                                            <strong>Privado</strong>
+
+                                            <text> - Solo visible en debug</text>
+                                        }
+                                    </label>
+                                </div>
+                                @if (!article.EsPublico)
+                                {
+                                    <small class="text-muted">
+                                        Este artículo no será visible cuando la aplicación esté en release.
+                                    </small>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="card mb-4 shadow-elegant">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Vista Previa</h5>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" @onclick="TogglePreview">
+                                <i class="bi bi-eye@(showPreview ? "-slash" : "")"></i>
+                            </button>
+                        </div>
+                        @if (showPreview)
+                        {
+                            <div class="card-body preview-content">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h4 class="text-gradient">@article.Titulo</h4>
+                                    @if (!article.EsPublico)
+                                    {
+                                        <span class="badge badge-warning">
+                                            <i class="bi bi-eye-slash"></i> Privado
+                                        </span>
+                                    }
+                                </div>
+                                <p class="text-muted">@article.Descripcion</p>
+                                <hr />
+                                <div>@((MarkupString)ConvertMarkdownToHtml(article.Contenido))</div>
+                                @if (!string.IsNullOrWhiteSpace(article.PieDePagina))
+                                {
+                                    <hr class="mt-4" />
+                                    <div class="text-muted small">
+                                        @((MarkupString)ConvertMarkdownToHtml(article.PieDePagina))
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4 shadow-elegant">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Contenido (Markdown)</h5>
+                    <div class="btn-group btn-group-sm" role="group">
+                        <button type="button" class="btn btn-outline-secondary" @onclick="@(() => InsertMarkdown("**", "**"))" title="Negrita">
+                            <strong>B</strong>
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" @onclick="@(() => InsertMarkdown("*", "*"))" title="Cursiva">
+                            <em>I</em>
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" @onclick="@(() => InsertMarkdown("## ", ""))" title="Encabezado">
+                            H2
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" @onclick="@(() => InsertMarkdown("> ", ""))" title="Cita">
+                            <i class="bi bi-quote"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" @onclick="@(() => InsertMarkdown("- ", ""))" title="Lista">
+                            <i class="bi bi-list-ul"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" @onclick="@(() => InsertMarkdown("[texto](", ")"))" title="Enlace">
+                            <i class="bi bi-link-45deg"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <InputTextArea @ref="contentTextArea" class="form-control font-monospace" rows="15" 
+                                   @bind-Value="article.Contenido" 
+                                   placeholder="Escribe el contenido del artículo en Markdown..." />
+                    <small class="text-muted mt-2 d-block">
+                        Usa Markdown para dar formato al texto. 
+                        <a href="https://www.markdownguide.org/basic-syntax/" target="_blank">Guía de Markdown</a>
+                    </small>
+                </div>
+            </div>
+
+            <div class="card mb-4 shadow-elegant">
+                <div class="card-header">
+                    <h5 class="mb-0">Pie de Página (Opcional)</h5>
+                </div>
+                <div class="card-body">
+                    <InputTextArea class="form-control font-monospace" rows="4" 
+                                   @bind-Value="article.PieDePagina" 
+                                   placeholder="Información adicional, referencias, notas al pie..." />
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 mb-5">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-circle"></i> @(IsEditing ? "Actualizar" : "Publicar") Artículo
+                </button>
+                <button type="button" class="btn btn-outline-secondary" @onclick="Cancel">
+                    <i class="bi bi-x-circle"></i> Cancelar
+                </button>
+                @if (IsEditing)
+                {
+                    <button type="button" class="btn btn-outline-danger ms-auto" @onclick="DeleteArticle">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </button>
+                }
+            </div>
+        </EditForm>
+    </div>
+
+    <style>
+        .preview-content {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .preview-content h2, .preview-content h3 {
+            margin-top: 1.5rem;
+            color: var(--color-primary);
+        }
+
+        .preview-content blockquote {
+            border-left: 4px solid var(--color-primary);
+            padding-left: 1.5rem;
+            margin: 1.5rem 0;
+            color: var(--color-gray);
+            background: var(--color-cream);
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius-sm);
+        }
+
+        .preview-content ul, .preview-content ol {
+            padding-left: 2rem;
+        }
+
+        .form-control.font-monospace {
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 0.95rem;
+        }
+    </style>
+}
+
+@code {
+    [Parameter]
+    public string? Id { get; set; }
+
+    private Article article = new();
+    private bool IsEditing => !string.IsNullOrEmpty(Id);
+    private bool showPreview = true;
+    private InputTextArea? contentTextArea;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Redirigir si no está en modo debug
+        if (!BuildConfiguration.IsDebugMode)
+        {
+            Navigation.NavigateTo("/articulos");
+            return;
+        }
+
+        await ArticleService.InitializeAsync();
+        
+        if (IsEditing)
+        {
+            var existingArticle = ArticleService.GetArticleById(Id!);
+            if (existingArticle != null)
+            {
+                article = existingArticle;
+            }
+            else
+            {
+                Navigation.NavigateTo("/articulos");
+            }
+        }
+    }
+
+    private async Task HandleSubmit()
+    {
+        if (IsEditing)
+        {
+            await ArticleService.UpdateArticleAsync(article);
+        }
+        else
+        {
+            await ArticleService.AddArticleAsync(article);
+        }
+        Navigation.NavigateTo("/articulos");
+    }
+
+    private void Cancel()
+    {
+        Navigation.NavigateTo("/articulos");
+    }
+
+    private async Task DeleteArticle()
+    {
+        bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", 
+            "¿Estás seguro de que deseas eliminar este artículo?");
+        if (confirmed)
+        {
+            await ArticleService.DeleteArticleAsync(article.Id);
+            Navigation.NavigateTo("/articulos");
+        }
+    }
+
+    private void TogglePreview()
+    {
+        showPreview = !showPreview;
+    }
+
+    private void InsertMarkdown(string before, string after)
+    {
+        article.Contenido += before + "texto" + after;
+    }
+
+    private string ConvertMarkdownToHtml(string markdown)
+    {
+        if (string.IsNullOrWhiteSpace(markdown))
+            return string.Empty;
+
+        var pipeline = new MarkdownPipelineBuilder()
+            .UseAdvancedExtensions()
+            .Build();
+
+        return Markdown.ToHtml(markdown, pipeline);
+    }
+}
