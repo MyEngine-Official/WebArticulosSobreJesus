@@ -1,0 +1,356 @@
+@using Microsoft.JSInterop
+
+<div class="markdown-editor-container">
+    <div class="editor-toolbar">
+        <div class="toolbar-group">
+            <button type="button" class="toolbar-btn" @onclick="@(() => InsertFormat("**", "**"))" title="Negrita (Ctrl+B)">
+                <i class="bi bi-type-bold"></i>
+            </button>
+            <button type="button" class="toolbar-btn" @onclick="@(() => InsertFormat("*", "*"))" title="Cursiva (Ctrl+I)">
+                <i class="bi bi-type-italic"></i>
+            </button>
+            <button type="button" class="toolbar-btn" @onclick="@(() => InsertFormat("~~", "~~"))" title="Tachado">
+                <i class="bi bi-type-strikethrough"></i>
+            </button>
+        </div>
+        
+        <div class="toolbar-divider"></div>
+        
+        <div class="toolbar-group">
+            <button type="button" class="toolbar-btn" @onclick="@(() => InsertLine("# "))" title="Título 1">
+                H1
+            </button>
+            <button type="button" class="toolbar-btn" @onclick="@(() => InsertLine("## "))" title="Título 2">
+                H2
+            </button>
+            <button type="button" class="toolbar-btn" @onclick="@(() => InsertLine("### "))" title="Título 3">
+                H3
+            </button>
+        </div>
+        
+        <div class="toolbar-divider"></div>
+        
+        <div class="toolbar-group">
+            <button type="button" class="toolbar-btn" @onclick="@(() => InsertLine("> "))" title="Cita">
+                <i class="bi bi-quote"></i>
+            </button>
+            <button type="button" class="toolbar-btn" @onclick="@(() => InsertLine("- "))" title="Lista">
+                <i class="bi bi-list-ul"></i>
+            </button>
+            <button type="button" class="toolbar-btn" @onclick="@(() => InsertLine("1. "))" title="Lista numerada">
+                <i class="bi bi-list-ol"></i>
+            </button>
+            <button type="button" class="toolbar-btn" @onclick="InsertCheckbox" title="Checkbox">
+                <i class="bi bi-check2-square"></i>
+            </button>
+        </div>
+        
+        <div class="toolbar-divider"></div>
+        
+        <div class="toolbar-group">
+            <button type="button" class="toolbar-btn" @onclick="InsertLink" title="Enlace">
+                <i class="bi bi-link-45deg"></i>
+            </button>
+            <button type="button" class="toolbar-btn" @onclick="InsertImage" title="Imagen">
+                <i class="bi bi-image"></i>
+            </button>
+            <button type="button" class="toolbar-btn" @onclick="@(() => InsertFormat("`", "`"))" title="Código inline">
+                <i class="bi bi-code"></i>
+            </button>
+            <button type="button" class="toolbar-btn" @onclick="InsertCodeBlock" title="Bloque de código">
+                <i class="bi bi-code-square"></i>
+            </button>
+        </div>
+        
+        <div class="toolbar-divider"></div>
+        
+        <div class="toolbar-group">
+            <button type="button" class="toolbar-btn" @onclick="InsertTable" title="Tabla">
+                <i class="bi bi-table"></i>
+            </button>
+            <button type="button" class="toolbar-btn" @onclick="InsertHorizontalRule" title="Línea horizontal">
+                <i class="bi bi-hr"></i>
+            </button>
+        </div>
+        
+        <div class="toolbar-divider"></div>
+        
+        <div class="toolbar-group">
+            <button type="button" class="toolbar-btn toolbar-btn-special" @onclick="ToggleBibleSearch" title="Buscar versículo">
+                <i class="bi bi-book-half"></i>
+            </button>
+        </div>
+    </div>
+
+    @if (showBibleSearch)
+    {
+        <div class="bible-search-panel">
+            <BibleSearch OnInsertVerse="InsertBibleVerse" />
+        </div>
+    }
+
+    <textarea class="editor-textarea @(showBibleSearch ? "with-bible-panel" : "")"
+              value="@Value"
+              @oninput="HandleInput"
+              placeholder="@Placeholder"
+              rows="@Rows"></textarea>
+    
+    <div class="editor-footer">
+        <div class="editor-info">
+            <span class="char-count">@(Value?.Length ?? 0) caracteres</span>
+            <span class="word-count">~@WordCount palabras</span>
+        </div>
+        <div class="editor-help">
+            <a href="https://www.markdownguide.org/basic-syntax/" target="_blank" rel="noopener">
+                <i class="bi bi-question-circle"></i> Guía de Markdown
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .markdown-editor-container {
+        border: 2px solid var(--color-gray-light);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        background: var(--color-white);
+        transition: all var(--transition-fast);
+    }
+
+    .markdown-editor-container:focus-within {
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 4px rgba(176, 42, 41, 0.1);
+    }
+
+    .editor-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem;
+        padding: 0.75rem;
+        background: linear-gradient(135deg, var(--color-cream) 0%, var(--color-off-white) 100%);
+        border-bottom: 1px solid var(--color-gray-light);
+    }
+
+    .toolbar-group {
+        display: flex;
+        gap: 0.25rem;
+    }
+
+    .toolbar-divider {
+        width: 1px;
+        background: var(--color-gray-light);
+        margin: 0 0.5rem;
+        align-self: stretch;
+    }
+
+    .toolbar-btn {
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid transparent;
+        border-radius: var(--radius-sm);
+        background: transparent;
+        color: var(--color-dark);
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all var(--transition-fast);
+    }
+
+    .toolbar-btn:hover {
+        background: var(--color-white);
+        border-color: var(--color-gray-light);
+        color: var(--color-primary);
+    }
+
+    .toolbar-btn:active {
+        background: var(--color-primary);
+        color: var(--color-white);
+        border-color: var(--color-primary);
+    }
+
+    .toolbar-btn-special {
+        color: var(--color-primary);
+    }
+
+    .toolbar-btn-special:hover {
+        background: var(--color-primary);
+        color: var(--color-white);
+    }
+
+    .bible-search-panel {
+        padding: 1rem;
+        background: var(--color-off-white);
+        border-bottom: 1px solid var(--color-gray-light);
+    }
+
+    .editor-textarea {
+        width: 100%;
+        min-height: 300px;
+        padding: 1.25rem;
+        border: none;
+        resize: vertical;
+        font-family: 'Fira Code', 'Consolas', 'Monaco', monospace;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        color: var(--color-dark);
+        background: var(--color-white);
+        outline: none;
+    }
+
+    .editor-textarea.with-bible-panel {
+        min-height: 200px;
+    }
+
+    .editor-textarea::placeholder {
+        color: var(--color-gray);
+        font-style: italic;
+    }
+
+    .editor-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        background: var(--color-cream);
+        border-top: 1px solid var(--color-gray-light);
+        font-size: 0.8rem;
+    }
+
+    .editor-info {
+        display: flex;
+        gap: 1rem;
+        color: var(--color-gray);
+    }
+
+    .editor-help a {
+        color: var(--color-gray);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        transition: color var(--transition-fast);
+    }
+
+    .editor-help a:hover {
+        color: var(--color-primary);
+    }
+
+    .editor-help a::after {
+        display: none;
+    }
+
+    @@media (max-width: 768px) {
+        .editor-toolbar {
+            padding: 0.5rem;
+        }
+
+        .toolbar-btn {
+            width: 32px;
+            height: 32px;
+            font-size: 0.8rem;
+        }
+
+        .toolbar-divider {
+            display: none;
+        }
+
+        .editor-textarea {
+            min-height: 200px;
+            padding: 1rem;
+        }
+
+        .editor-footer {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+    }
+</style>
+
+@code {
+    [Parameter]
+    public string Value { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback<string> ValueChanged { get; set; }
+
+    [Parameter]
+    public string Placeholder { get; set; } = "Escribe el contenido en Markdown...";
+
+    [Parameter]
+    public int Rows { get; set; } = 15;
+
+    private bool showBibleSearch = false;
+
+    private int WordCount => string.IsNullOrWhiteSpace(Value) 
+        ? 0 
+        : Value.Split(new[] { ' ', '\n', '\r', '\t' }, StringSplitOptions.RemoveEmptyEntries).Length;
+
+    private async Task HandleInput(ChangeEventArgs e)
+    {
+        Value = e.Value?.ToString() ?? string.Empty;
+        await ValueChanged.InvokeAsync(Value);
+    }
+
+    private async Task InsertFormat(string before, string after)
+    {
+        Value += $"{before}texto{after}";
+        await ValueChanged.InvokeAsync(Value);
+    }
+
+    private async Task InsertLine(string prefix)
+    {
+        Value += $"\n{prefix}";
+        await ValueChanged.InvokeAsync(Value);
+    }
+
+    private async Task InsertLink()
+    {
+        Value += "\n[texto del enlace](https://url.com)";
+        await ValueChanged.InvokeAsync(Value);
+    }
+
+    private async Task InsertImage()
+    {
+        Value += "\n![descripción de la imagen](https://url-imagen.com/imagen.jpg)";
+        await ValueChanged.InvokeAsync(Value);
+    }
+
+    private async Task InsertCodeBlock()
+    {
+        Value += "\n```\n// código aquí\n```\n";
+        await ValueChanged.InvokeAsync(Value);
+    }
+
+    private async Task InsertTable()
+    {
+        Value += "\n| Columna 1 | Columna 2 | Columna 3 |\n|-----------|-----------|------------|\n| Dato 1    | Dato 2    | Dato 3     |\n";
+        await ValueChanged.InvokeAsync(Value);
+    }
+
+    private async Task InsertHorizontalRule()
+    {
+        Value += "\n\n---\n\n";
+        await ValueChanged.InvokeAsync(Value);
+    }
+
+    private async Task InsertCheckbox()
+    {
+        Value += "\n- [ ] Tarea pendiente";
+        await ValueChanged.InvokeAsync(Value);
+    }
+
+    private void ToggleBibleSearch()
+    {
+        showBibleSearch = !showBibleSearch;
+    }
+
+    private async Task InsertBibleVerse(string verse)
+    {
+        Value += verse;
+        await ValueChanged.InvokeAsync(Value);
+        showBibleSearch = false;
+    }
+}

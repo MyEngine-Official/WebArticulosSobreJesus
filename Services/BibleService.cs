@@ -1,0 +1,225 @@
+using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
+
+namespace QuienEsJesus.Services;
+
+public class BibleService
+{
+    private readonly HttpClient _httpClient;
+    private const string BaseUrl = "https://bible-api.com";
+    private static readonly Dictionary<string, string> SpanishBookNames = new()
+    {
+        // Old Testament
+        {"genesis", "Génesis"}, {"gen", "Génesis"},
+        {"exodus", "Éxodo"}, {"exo", "Éxodo"},
+        {"leviticus", "Levítico"}, {"lev", "Levítico"},
+        {"numbers", "Números"}, {"num", "Números"},
+        {"deuteronomy", "Deuteronomio"}, {"deut", "Deuteronomio"},
+        {"joshua", "Josué"}, {"josh", "Josué"},
+        {"judges", "Jueces"}, {"judg", "Jueces"},
+        {"ruth", "Rut"},
+        {"1 samuel", "1 Samuel"}, {"1sam", "1 Samuel"},
+        {"2 samuel", "2 Samuel"}, {"2sam", "2 Samuel"},
+        {"1 kings", "1 Reyes"}, {"1kgs", "1 Reyes"},
+        {"2 kings", "2 Reyes"}, {"2kgs", "2 Reyes"},
+        {"1 chronicles", "1 Crónicas"}, {"1chr", "1 Crónicas"},
+        {"2 chronicles", "2 Crónicas"}, {"2chr", "2 Crónicas"},
+        {"ezra", "Esdras"},
+        {"nehemiah", "Nehemías"}, {"neh", "Nehemías"},
+        {"esther", "Ester"}, {"est", "Ester"},
+        {"job", "Job"},
+        {"psalms", "Salmos"}, {"psalm", "Salmos"}, {"ps", "Salmos"},
+        {"proverbs", "Proverbios"}, {"prov", "Proverbios"},
+        {"ecclesiastes", "Eclesiastés"}, {"eccl", "Eclesiastés"},
+        {"song of solomon", "Cantares"}, {"song", "Cantares"},
+        {"isaiah", "Isaías"}, {"isa", "Isaías"},
+        {"jeremiah", "Jeremías"}, {"jer", "Jeremías"},
+        {"lamentations", "Lamentaciones"}, {"lam", "Lamentaciones"},
+        {"ezekiel", "Ezequiel"}, {"ezek", "Ezequiel"},
+        {"daniel", "Daniel"}, {"dan", "Daniel"},
+        {"hosea", "Oseas"}, {"hos", "Oseas"},
+        {"joel", "Joel"},
+        {"amos", "Amós"},
+        {"obadiah", "Abdías"}, {"obad", "Abdías"},
+        {"jonah", "Jonás"}, {"jon", "Jonás"},
+        {"micah", "Miqueas"}, {"mic", "Miqueas"},
+        {"nahum", "Nahúm"}, {"nah", "Nahúm"},
+        {"habakkuk", "Habacuc"}, {"hab", "Habacuc"},
+        {"zephaniah", "Sofonías"}, {"zeph", "Sofonías"},
+        {"haggai", "Hageo"}, {"hag", "Hageo"},
+        {"zechariah", "Zacarías"}, {"zech", "Zacarías"},
+        {"malachi", "Malaquías"}, {"mal", "Malaquías"},
+        // New Testament
+        {"matthew", "Mateo"}, {"matt", "Mateo"}, {"mat", "Mateo"},
+        {"mark", "Marcos"}, {"mar", "Marcos"},
+        {"luke", "Lucas"}, {"luk", "Lucas"},
+        {"john", "Juan"}, {"joh", "Juan"},
+        {"acts", "Hechos"}, {"act", "Hechos"},
+        {"romans", "Romanos"}, {"rom", "Romanos"},
+        {"1 corinthians", "1 Corintios"}, {"1cor", "1 Corintios"},
+        {"2 corinthians", "2 Corintios"}, {"2cor", "2 Corintios"},
+        {"galatians", "Gálatas"}, {"gal", "Gálatas"},
+        {"ephesians", "Efesios"}, {"eph", "Efesios"},
+        {"philippians", "Filipenses"}, {"phil", "Filipenses"},
+        {"colossians", "Colosenses"}, {"col", "Colosenses"},
+        {"1 thessalonians", "1 Tesalonicenses"}, {"1thess", "1 Tesalonicenses"},
+        {"2 thessalonians", "2 Tesalonicenses"}, {"2thess", "2 Tesalonicenses"},
+        {"1 timothy", "1 Timoteo"}, {"1tim", "1 Timoteo"},
+        {"2 timothy", "2 Timoteo"}, {"2tim", "2 Timoteo"},
+        {"titus", "Tito"},
+        {"philemon", "Filemón"}, {"philem", "Filemón"},
+        {"hebrews", "Hebreos"}, {"heb", "Hebreos"},
+        {"james", "Santiago"}, {"jam", "Santiago"},
+        {"1 peter", "1 Pedro"}, {"1pet", "1 Pedro"},
+        {"2 peter", "2 Pedro"}, {"2pet", "2 Pedro"},
+        {"1 john", "1 Juan"}, {"1jn", "1 Juan"},
+        {"2 john", "2 Juan"}, {"2jn", "2 Juan"},
+        {"3 john", "3 Juan"}, {"3jn", "3 Juan"},
+        {"jude", "Judas"},
+        {"revelation", "Apocalipsis"}, {"rev", "Apocalipsis"}
+    };
+
+    public BibleService(HttpClient httpClient)
+    {
+        _httpClient = httpClient;
+    }
+
+    public async Task<BibleVerseResult?> GetVerseAsync(string reference, string translation = "kjv")
+    {
+        try
+        {
+            var encodedRef = Uri.EscapeDataString(reference);
+            var url = $"{BaseUrl}/{encodedRef}?translation={translation}";
+            
+            var response = await _httpClient.GetAsync(url);
+            
+            if (!response.IsSuccessStatusCode)
+                return null;
+
+            var result = await response.Content.ReadFromJsonAsync<BibleApiResponse>();
+            
+            if (result == null)
+                return null;
+
+            return new BibleVerseResult
+            {
+                Reference = result.Reference ?? reference,
+                ReferenceSpanish = TranslateReference(result.Reference ?? reference),
+                Text = result.Text ?? string.Empty,
+                Translation = result.TranslationName ?? translation.ToUpper(),
+                Verses = result.Verses?.Select(v => new BibleVerse
+                {
+                    BookName = v.BookName ?? string.Empty,
+                    Chapter = v.Chapter,
+                    Verse = v.Verse,
+                    Text = v.Text ?? string.Empty
+                }).ToList() ?? new List<BibleVerse>()
+            };
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    public async Task<List<BibleVerseResult>> SearchVersesAsync(string query, string translation = "kjv")
+    {
+        // bible-api.com doesn't have search, so we'll return suggestions based on common references
+        var results = new List<BibleVerseResult>();
+        
+        // Try to parse as a reference first
+        var verse = await GetVerseAsync(query, translation);
+        if (verse != null)
+        {
+            results.Add(verse);
+        }
+        
+        return results;
+    }
+
+    public List<string> GetPopularReferences()
+    {
+        return new List<string>
+        {
+            "John 3:16",
+            "Psalm 23",
+            "Romans 8:28",
+            "Philippians 4:13",
+            "Jeremiah 29:11",
+            "Proverbs 3:5-6",
+            "Isaiah 40:31",
+            "Matthew 11:28-30",
+            "Romans 12:1-2",
+            "1 Corinthians 13:4-8"
+        };
+    }
+
+    private string TranslateReference(string reference)
+    {
+        var result = reference;
+        foreach (var kvp in SpanishBookNames)
+        {
+            var pattern = $@"\b{Regex.Escape(kvp.Key)}\b";
+            result = Regex.Replace(result, pattern, kvp.Value, RegexOptions.IgnoreCase);
+        }
+        return result;
+    }
+}
+
+public class BibleApiResponse
+{
+    [JsonPropertyName("reference")]
+    public string? Reference { get; set; }
+
+    [JsonPropertyName("verses")]
+    public List<BibleApiVerse>? Verses { get; set; }
+
+    [JsonPropertyName("text")]
+    public string? Text { get; set; }
+
+    [JsonPropertyName("translation_id")]
+    public string? TranslationId { get; set; }
+
+    [JsonPropertyName("translation_name")]
+    public string? TranslationName { get; set; }
+
+    [JsonPropertyName("translation_note")]
+    public string? TranslationNote { get; set; }
+}
+
+public class BibleApiVerse
+{
+    [JsonPropertyName("book_id")]
+    public string? BookId { get; set; }
+
+    [JsonPropertyName("book_name")]
+    public string? BookName { get; set; }
+
+    [JsonPropertyName("chapter")]
+    public int Chapter { get; set; }
+
+    [JsonPropertyName("verse")]
+    public int Verse { get; set; }
+
+    [JsonPropertyName("text")]
+    public string? Text { get; set; }
+}
+
+public class BibleVerseResult
+{
+    public string Reference { get; set; } = string.Empty;
+    public string ReferenceSpanish { get; set; } = string.Empty;
+    public string Text { get; set; } = string.Empty;
+    public string Translation { get; set; } = string.Empty;
+    public List<BibleVerse> Verses { get; set; } = new();
+}
+
+public class BibleVerse
+{
+    public string BookName { get; set; } = string.Empty;
+    public int Chapter { get; set; }
+    public int Verse { get; set; }
+    public string Text { get; set; } = string.Empty;
+}
