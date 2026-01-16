@@ -296,7 +296,7 @@
 
     private async Task InsertFormat(string before, string after)
     {
-        Value += $"{before}texto{after}";
+        Value += $"{before}{after}";
         await ValueChanged.InvokeAsync(Value);
     }
 

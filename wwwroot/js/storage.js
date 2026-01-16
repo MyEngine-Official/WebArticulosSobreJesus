@@ -10,6 +10,13 @@ window.localStorageHelper = {
     }
 };
 
+// Safe function to set document theme attribute
+window.setDocumentTheme = function (theme) {
+    if (theme && (theme === 'dark' || theme === 'light')) {
+        document.documentElement.setAttribute('data-theme', theme);
+    }
+};
+
 // Scroll to heading for table of contents
 window.scrollToHeading = function (headingId) {
     // Find the heading by looking for matching text content

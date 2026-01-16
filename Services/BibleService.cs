@@ -118,7 +118,15 @@ public class BibleService
                 }).ToList() ?? new List<BibleVerse>()
             };
         }
-        catch
+        catch (HttpRequestException)
+        {
+            return null;
+        }
+        catch (TaskCanceledException)
+        {
+            return null;
+        }
+        catch (JsonException)
         {
             return null;
         }

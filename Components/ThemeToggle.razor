@@ -93,7 +93,7 @@
     {
         try
         {
-            await JSRuntime.InvokeVoidAsync("eval", $"document.documentElement.setAttribute('data-theme', '{theme}')");
+            await JSRuntime.InvokeVoidAsync("setDocumentTheme", theme);
         }
         catch
         {

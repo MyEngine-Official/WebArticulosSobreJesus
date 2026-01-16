@@ -382,10 +382,12 @@ else
     private Article? article;
     private ArticleViewHelper viewHelper = new();
     private bool linkCopied = false;
+    
+    private const int WordsPerMinute = 200;
 
     private int EstimatedReadTime => string.IsNullOrWhiteSpace(article?.Contenido) 
         ? 1 
-        : Math.Max(1, article.Contenido.Split(new[] { ' ', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries).Length / 200);
+        : Math.Max(1, article.Contenido.Split(new[] { ' ', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries).Length / WordsPerMinute);
 
     protected override async Task OnInitializedAsync()
     {

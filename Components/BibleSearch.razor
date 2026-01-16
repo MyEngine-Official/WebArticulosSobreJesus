@@ -1,4 +1,6 @@
 @using QuienEsJesus.Services
+@using System.Net.Http
+@using System.Threading.Tasks
 
 <div class="bible-search-container">
     <div class="bible-search-header">
@@ -260,9 +262,13 @@
                 errorMessage = "No se encontró la referencia. Intenta con formato: 'Juan 3:16' o 'John 3:16'";
             }
         }
-        catch (Exception)
+        catch (HttpRequestException)
         {
-            errorMessage = "Error al buscar el versículo. Verifica tu conexión a internet.";
+            errorMessage = "Error de conexión. Verifica tu conexión a internet.";
+        }
+        catch (TaskCanceledException)
+        {
+            errorMessage = "La búsqueda tardó demasiado. Intenta de nuevo.";
         }
         finally
         {
