@@ -1,14 +1,18 @@
 using System.Net.Http.Json;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
+using System.Globalization;
 
 namespace QuienEsJesus.Services;
 
 public class BibleService
 {
     private readonly HttpClient _httpClient;
-    private const string BaseUrl = "https://bible-api.com";
+    private const string PrimaryApiUrl = "https://bible-api.com";
+    private const string DefaultTranslation = "rvr"; // Reina-Valera Revisada (Spanish)
+    
     private static readonly Dictionary<string, string> SpanishBookNames = new()
     {
         // Old Testament
@@ -81,17 +85,85 @@ public class BibleService
         {"revelation", "Apocalipsis"}, {"rev", "Apocalipsis"}
     };
 
+    // Mapping from Spanish book names (normalized, no accents) to English for API calls
+    private static readonly Dictionary<string, string> SpanishToEnglishBooks = new(StringComparer.OrdinalIgnoreCase)
+    {
+        {"genesis", "genesis"},
+        {"exodo", "exodus"},
+        {"levitico", "leviticus"},
+        {"numeros", "numbers"},
+        {"deuteronomio", "deuteronomy"},
+        {"josue", "joshua"},
+        {"jueces", "judges"},
+        {"rut", "ruth"},
+        {"samuel", "samuel"},
+        {"reyes", "kings"},
+        {"cronicas", "chronicles"},
+        {"esdras", "ezra"},
+        {"nehemias", "nehemiah"},
+        {"ester", "esther"},
+        {"job", "job"},
+        {"salmos", "psalms"},
+        {"salmo", "psalm"},
+        {"proverbios", "proverbs"},
+        {"eclesiastes", "ecclesiastes"},
+        {"cantares", "song of solomon"},
+        {"isaias", "isaiah"},
+        {"jeremias", "jeremiah"},
+        {"lamentaciones", "lamentations"},
+        {"ezequiel", "ezekiel"},
+        {"daniel", "daniel"},
+        {"oseas", "hosea"},
+        {"joel", "joel"},
+        {"amos", "amos"},
+        {"abdias", "obadiah"},
+        {"jonas", "jonah"},
+        {"miqueas", "micah"},
+        {"nahum", "nahum"},
+        {"habacuc", "habakkuk"},
+        {"sofonias", "zephaniah"},
+        {"hageo", "haggai"},
+        {"zacarias", "zechariah"},
+        {"malaquias", "malachi"},
+        {"mateo", "matthew"},
+        {"marcos", "mark"},
+        {"lucas", "luke"},
+        {"juan", "john"},
+        {"hechos", "acts"},
+        {"romanos", "romans"},
+        {"corintios", "corinthians"},
+        {"galatas", "galatians"},
+        {"efesios", "ephesians"},
+        {"filipenses", "philippians"},
+        {"colosenses", "colossians"},
+        {"tesalonicenses", "thessalonians"},
+        {"timoteo", "timothy"},
+        {"tito", "titus"},
+        {"filemon", "philemon"},
+        {"hebreos", "hebrews"},
+        {"santiago", "james"},
+        {"pedro", "peter"},
+        {"judas", "jude"},
+        {"apocalipsis", "revelation"}
+    };
+
     public BibleService(HttpClient httpClient)
     {
         _httpClient = httpClient;
     }
 
-    public async Task<BibleVerseResult?> GetVerseAsync(string reference, string translation = "kjv")
+    public async Task<BibleVerseResult?> GetVerseAsync(string reference, string? translation = null)
     {
+        // Use Spanish RVR translation by default
+        translation ??= DefaultTranslation;
+        
+        // Normalize the reference - translate Spanish book names to English for the API
+        var normalizedReference = NormalizeReferenceForApi(reference);
+        
         try
         {
-            var encodedRef = Uri.EscapeDataString(reference);
-            var url = $"{BaseUrl}/{encodedRef}?translation={translation}";
+            var encodedRef = Uri.EscapeDataString(normalizedReference);
+            var url = $"{PrimaryApiUrl}/{encodedRef}?translation={translation}";
             
             var response = await _httpClient.GetAsync(url);
             
@@ -103,12 +175,15 @@ public class BibleService
             if (result == null)
                 return null;
 
+            // Get the Spanish translation name
+            var translationName = GetSpanishTranslationName(translation);
+
             return new BibleVerseResult
             {
                 Reference = result.Reference ?? reference,
                 ReferenceSpanish = TranslateReference(result.Reference ?? reference),
                 Text = result.Text ?? string.Empty,
-                Translation = result.TranslationName ?? translation.ToUpper(),
+                Translation = translationName,
                 Verses = result.Verses?.Select(v => new BibleVerse
                 {
                     BookName = v.BookName ?? string.Empty,
@@ -132,7 +207,71 @@ public class BibleService
         }
     }
 
-    public async Task<List<BibleVerseResult>> SearchVersesAsync(string query, string translation = "kjv")
+    private string NormalizeReferenceForApi(string reference)
+    {
+        // Remove accents from the reference for consistent dictionary lookup
+        var normalizedInput = RemoveAccents(reference.Trim());
+        
+        // Split the reference to find book name (handles numbered books like "1 Juan")
+        var words = normalizedInput.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToList();
+        
+        for (int i = 0; i < words.Count; i++)
+        {
+            var word = words[i];
+            
+            // Check if this is a numbered book prefix
+            if (i < words.Count - 1 && char.IsDigit(word[0]) && word.Length == 1)
+            {
+                continue; // Skip the number, will be handled with next word
+            }
+            
+            // Check if previous was a number (for books like "1 Juan")
+            var lookupWord = word;
+            if (i > 0 && words[i - 1].Length == 1 && char.IsDigit(words[i - 1][0]))
+            {
+                // This is part of a numbered book, lookup just the book name
+            }
+            
+            if (SpanishToEnglishBooks.TryGetValue(lookupWord, out var englishBook))
+            {
+                words[i] = englishBook;
+            }
+        }
+        
+        return string.Join(" ", words);
+    }
+
+    private static string RemoveAccents(string text)
+    {
+        var normalizedString = text.Normalize(NormalizationForm.FormD);
+        var stringBuilder = new System.Text.StringBuilder();
+
+        foreach (var c in normalizedString)
+        {
+            var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
+            if (unicodeCategory != UnicodeCategory.NonSpacingMark)
+            {
+                stringBuilder.Append(c);
+            }
+        }
+
+        return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
+    }
+
+    private static string GetSpanishTranslationName(string translation)
+    {
+        return translation.ToLower() switch
+        {
+            "rvr" => "Reina-Valera Revisada",
+            "rvr60" => "Reina-Valera 1960",
+            "rvr95" => "Reina-Valera 1995",
+            "lbla" => "La Biblia de las Américas",
+            "nvi" => "Nueva Versión Internacional",
+            _ => translation.ToUpper()
+        };
+    }
+
+    public async Task<List<BibleVerseResult>> SearchVersesAsync(string query, string? translation = null)
     {
         // bible-api.com doesn't have search, so we'll return suggestions based on common references
         var results = new List<BibleVerseResult>();
@@ -151,16 +290,16 @@ public class BibleService
     {
         return new List<string>
         {
-            "John 3:16",
-            "Psalm 23",
-            "Romans 8:28",
-            "Philippians 4:13",
-            "Jeremiah 29:11",
-            "Proverbs 3:5-6",
-            "Isaiah 40:31",
-            "Matthew 11:28-30",
-            "Romans 12:1-2",
-            "1 Corinthians 13:4-8"
+            "Juan 3:16",
+            "Salmos 23",
+            "Romanos 8:28",
+            "Filipenses 4:13",
+            "Jeremías 29:11",
+            "Proverbios 3:5-6",
+            "Isaías 40:31",
+            "Mateo 11:28-30",
+            "Romanos 12:1-2",
+            "1 Corintios 13:4-8"
         };
     }
 
