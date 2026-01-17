@@ -1,6 +1,7 @@
 @page "/biblia"
 @inject BibleService BibleService
 @inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
 
 <PageTitle>Biblia LBLA - ¿Quién es Jesús?</PageTitle>
 
@@ -207,11 +208,18 @@
     private async Task CopyVerse(BibleSearchResult result)
     {
         var textToCopy = $"\"{result.Text}\" - {result.Reference} (LBLA)";
-        // Note: In Blazor WASM, we would need JS interop for clipboard
-        // For now, just show the toast
-        showCopiedToast = true;
-        StateHasChanged();
-        await Task.Delay(3000);
-        showCopiedToast = false;
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", textToCopy);
+            showCopiedToast = true;
+            StateHasChanged();
+            await Task.Delay(3000);
+            showCopiedToast = false;
+        }
+        catch
+        {
+            // Clipboard API may not be available in all browsers
+            showCopiedToast = false;
+        }
     }
 }
