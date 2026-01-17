@@ -7,7 +7,6 @@
     <!-- Full screen WebView displaying the Blazor WebAssembly app -->
     <WebView x:Name="blazorWebView"
              HorizontalOptions="Fill"
-             VerticalOptions="Fill"
-             Source="https://localhost:5000" />
+             VerticalOptions="Fill" />
 
 </ContentPage>
