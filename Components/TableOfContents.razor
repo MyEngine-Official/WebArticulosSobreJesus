@@ -1,0 +1,222 @@
+@using System.Text.RegularExpressions
+
+@if (headings.Any())
+{
+    <div class="toc-container">
+        <div class="toc-header" @onclick="ToggleToc">
+            <h6 class="toc-title">
+                <i class="bi bi-list-nested"></i> Contenido
+            </h6>
+            <i class="bi bi-chevron-@(isExpanded ? "up" : "down") toc-toggle"></i>
+        </div>
+        
+        @if (isExpanded)
+        {
+            <nav class="toc-nav">
+                <ul class="toc-list">
+                    @foreach (var heading in headings)
+                    {
+                        <li class="toc-item toc-level-@heading.Level">
+                            <a href="javascript:void(0)" 
+                               class="toc-link"
+                               @onclick="@(() => ScrollToHeading(heading.Id))">
+                                @heading.Text
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </nav>
+        }
+    </div>
+}
+
+<style>
+    .toc-container {
+        background: var(--color-white);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+        margin-bottom: 2rem;
+        overflow: hidden;
+        border: 1px solid var(--color-gray-light);
+    }
+
+    .toc-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.25rem;
+        background: linear-gradient(135deg, var(--color-cream) 0%, var(--color-off-white) 100%);
+        cursor: pointer;
+        user-select: none;
+        transition: background var(--transition-fast);
+    }
+
+    .toc-header:hover {
+        background: var(--color-cream);
+    }
+
+    .toc-title {
+        margin: 0;
+        font-weight: 700;
+        color: var(--color-primary);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.95rem;
+    }
+
+    .toc-toggle {
+        color: var(--color-gray);
+        transition: transform var(--transition-fast);
+    }
+
+    .toc-nav {
+        padding: 0.75rem 0;
+    }
+
+    .toc-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .toc-item {
+        position: relative;
+    }
+
+    .toc-link {
+        display: block;
+        padding: 0.5rem 1.25rem;
+        color: var(--color-dark);
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: all var(--transition-fast);
+        border-left: 3px solid transparent;
+    }
+
+    .toc-link::after {
+        display: none;
+    }
+
+    .toc-link:hover {
+        background: var(--color-cream);
+        color: var(--color-primary);
+        border-left-color: var(--color-primary);
+    }
+
+    .toc-level-2 .toc-link {
+        padding-left: 1.25rem;
+        font-weight: 600;
+    }
+
+    .toc-level-3 .toc-link {
+        padding-left: 2rem;
+        font-size: 0.85rem;
+    }
+
+    .toc-level-4 .toc-link {
+        padding-left: 2.75rem;
+        font-size: 0.8rem;
+        color: var(--color-gray);
+    }
+
+    .toc-level-5 .toc-link,
+    .toc-level-6 .toc-link {
+        padding-left: 3.5rem;
+        font-size: 0.8rem;
+        color: var(--color-gray);
+    }
+</style>
+
+@inject IJSRuntime JSRuntime
+
+@code {
+    [Parameter]
+    public string? Content { get; set; }
+
+    [Parameter]
+    public bool DefaultExpanded { get; set; } = true;
+
+    private List<TocHeading> headings = new();
+    private bool isExpanded = true;
+
+    protected override void OnInitialized()
+    {
+        isExpanded = DefaultExpanded;
+    }
+
+    protected override void OnParametersSet()
+    {
+        ExtractHeadings();
+    }
+
+    private void ExtractHeadings()
+    {
+        headings.Clear();
+        
+        if (string.IsNullOrWhiteSpace(Content))
+            return;
+
+        var regex = new Regex(@"^(#{1,6})\s+(.+)$", RegexOptions.Multiline);
+        var matches = regex.Matches(Content);
+
+        var idCounter = new Dictionary<string, int>();
+
+        foreach (Match match in matches)
+        {
+            var level = match.Groups[1].Value.Length;
+            var text = match.Groups[2].Value.Trim();
+            var baseId = GenerateId(text);
+            
+            // Handle duplicate IDs
+            if (idCounter.ContainsKey(baseId))
+            {
+                idCounter[baseId]++;
+                baseId = $"{baseId}-{idCounter[baseId]}";
+            }
+            else
+            {
+                idCounter[baseId] = 0;
+            }
+
+            headings.Add(new TocHeading
+            {
+                Level = level,
+                Text = text,
+                Id = baseId
+            });
+        }
+    }
+
+    private string GenerateId(string text)
+    {
+        // Remove special characters and convert to lowercase
+        var id = Regex.Replace(text.ToLowerInvariant(), @"[^\w\s-]", "");
+        id = Regex.Replace(id, @"\s+", "-");
+        return id;
+    }
+
+    private void ToggleToc()
+    {
+        isExpanded = !isExpanded;
+    }
+
+    private async Task ScrollToHeading(string id)
+    {
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("scrollToHeading", id);
+        }
+        catch
+        {
+            // Fallback if JS interop fails
+        }
+    }
+
+    private class TocHeading
+    {
+        public int Level { get; set; }
+        public string Text { get; set; } = string.Empty;
+        public string Id { get; set; } = string.Empty;
+    }
+}

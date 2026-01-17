@@ -1,0 +1,287 @@
+@page "/biblia"
+
+<PageTitle>Búsqueda Bíblica - ¿Quién es Jesús?</PageTitle>
+
+<div class="bible-page-container container mt-4 fade-in">
+    <div class="bible-page-header">
+        <h1 class="text-gradient">
+            <i class="bi bi-book-half"></i> Búsqueda Bíblica
+        </h1>
+        <p class="lead text-muted">
+            Busca versículos y referencias bíblicas para enriquecer tu estudio
+        </p>
+    </div>
+
+    <div class="row g-4 mt-4">
+        <div class="col-lg-8">
+            <BibleSearch OnInsertVerse="HandleVerseSelected" />
+            
+            @if (selectedVerses.Any())
+            {
+                <div class="saved-verses-section mt-4">
+                    <div class="saved-verses-header">
+                        <h5>
+                            <i class="bi bi-bookmark-star"></i> Versículos Guardados
+                        </h5>
+                        <button class="btn btn-sm btn-outline-secondary" @onclick="ClearVerses">
+                            <i class="bi bi-trash"></i> Limpiar
+                        </button>
+                    </div>
+                    <div class="saved-verses-list">
+                        @foreach (var verse in selectedVerses)
+                        {
+                            <div class="saved-verse-card">
+                                <button class="btn btn-sm btn-close remove-verse-btn" 
+                                        @onclick="@(() => RemoveVerse(verse))"></button>
+                                <div class="verse-text">@verse</div>
+                            </div>
+                        }
+                    </div>
+                    <div class="mt-3">
+                        <button class="btn btn-primary" @onclick="CopyAllVerses">
+                            <i class="bi bi-clipboard"></i> Copiar Todo
+                        </button>
+                    </div>
+                </div>
+            }
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="bible-info-card">
+                <h5 class="info-title">
+                    <i class="bi bi-info-circle"></i> Cómo Buscar
+                </h5>
+                <div class="info-content">
+                    <p>Puedes buscar versículos usando diferentes formatos:</p>
+                    <ul class="info-list">
+                        <li><code>Juan 3:16</code> - Un solo versículo</li>
+                        <li><code>Salmos 23</code> - Capítulo completo</li>
+                        <li><code>Romanos 8:28-30</code> - Rango de versículos</li>
+                        <li><code>John 3:16</code> - También acepta inglés</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="bible-info-card mt-4">
+                <h5 class="info-title">
+                    <i class="bi bi-lightbulb"></i> Versículos Destacados
+                </h5>
+                <div class="featured-verses">
+                    @foreach (var item in featuredVerses)
+                    {
+                        <div class="featured-verse">
+                            <span class="verse-ref">@item.Reference</span>
+                            <span class="verse-topic">@item.Topic</span>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bible-page-container {
+        max-width: 1200px;
+    }
+
+    .bible-page-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .bible-page-header h1 {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+    }
+
+    .bible-page-header .lead {
+        max-width: 600px;
+        margin: 1rem auto 0;
+    }
+
+    .saved-verses-section {
+        background: var(--color-white);
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        box-shadow: var(--shadow-md);
+    }
+
+    .saved-verses-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid var(--color-cream);
+    }
+
+    .saved-verses-header h5 {
+        margin: 0;
+        color: var(--color-primary);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .saved-verses-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .saved-verse-card {
+        position: relative;
+        background: var(--color-cream);
+        padding: 1rem 2rem 1rem 1rem;
+        border-radius: var(--radius-md);
+        border-left: 3px solid var(--color-primary);
+    }
+
+    .remove-verse-btn {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        font-size: 0.75rem;
+    }
+
+    .verse-text {
+        font-size: 0.9rem;
+        color: var(--color-dark);
+        white-space: pre-wrap;
+        font-style: italic;
+    }
+
+    .bible-info-card {
+        background: var(--color-white);
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        box-shadow: var(--shadow-sm);
+        border-top: 4px solid var(--color-secondary);
+    }
+
+    .info-title {
+        color: var(--color-secondary);
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .info-content p {
+        font-size: 0.9rem;
+        color: var(--color-gray);
+        margin-bottom: 1rem;
+    }
+
+    .info-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .info-list li {
+        padding: 0.5rem 0;
+        border-bottom: 1px dashed var(--color-gray-light);
+        font-size: 0.875rem;
+    }
+
+    .info-list li:last-child {
+        border-bottom: none;
+    }
+
+    .info-list code {
+        background: var(--color-cream);
+        padding: 0.2rem 0.5rem;
+        border-radius: var(--radius-sm);
+        color: var(--color-primary);
+        font-size: 0.85rem;
+    }
+
+    .featured-verses {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .featured-verse {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid var(--color-gray-light);
+        font-size: 0.875rem;
+    }
+
+    .featured-verse:last-child {
+        border-bottom: none;
+    }
+
+    .verse-ref {
+        color: var(--color-primary);
+        font-weight: 600;
+    }
+
+    .verse-topic {
+        color: var(--color-gray);
+        font-size: 0.8rem;
+    }
+
+    @@media (max-width: 992px) {
+        .bible-info-card {
+            margin-top: 1rem;
+        }
+    }
+</style>
+
+@inject IJSRuntime JSRuntime
+
+@code {
+    private List<string> selectedVerses = new();
+    
+    private List<(string Reference, string Topic)> featuredVerses = new()
+    {
+        ("Juan 3:16", "Salvación"),
+        ("Romanos 8:28", "Providencia"),
+        ("Filipenses 4:13", "Fortaleza"),
+        ("Salmos 23", "Confianza"),
+        ("Proverbios 3:5-6", "Sabiduría"),
+        ("Mateo 11:28", "Descanso"),
+        ("Isaías 40:31", "Esperanza"),
+        ("Romanos 12:1-2", "Consagración")
+    };
+
+    private void HandleVerseSelected(string verse)
+    {
+        if (!selectedVerses.Contains(verse))
+        {
+            selectedVerses.Add(verse);
+        }
+    }
+
+    private void RemoveVerse(string verse)
+    {
+        selectedVerses.Remove(verse);
+    }
+
+    private void ClearVerses()
+    {
+        selectedVerses.Clear();
+    }
+
+    private async Task CopyAllVerses()
+    {
+        var allText = string.Join("\n\n", selectedVerses);
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", allText);
+        }
+        catch
+        {
+            // Clipboard API not available
+        }
+    }
+}
