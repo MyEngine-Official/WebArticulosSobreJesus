@@ -1,4 +1,6 @@
 using QuienEsJesus.Models;
+using System.Globalization;
+using System.Text;
 using System.Text.Json;
 
 namespace QuienEsJesus.Services;
@@ -47,13 +49,14 @@ public class BibleService
     }
 
     /// <summary>
-    /// Obtiene un libro por su nombre
+    /// Obtiene un libro por su nombre (case-insensitive y accent-insensitive)
     /// </summary>
     public BibleBook? GetBookByName(string bookName)
     {
+        var searchNormalized = RemoveAccents(bookName.ToLowerInvariant());
         return _bible?.Books.FirstOrDefault(b => 
-            b.Name.Equals(bookName, StringComparison.OrdinalIgnoreCase) ||
-            b.Id.Equals(bookName, StringComparison.OrdinalIgnoreCase));
+            RemoveAccents(b.Name.ToLowerInvariant()).Contains(searchNormalized) ||
+            RemoveAccents(b.Id.ToLowerInvariant()).Contains(searchNormalized));
     }
 
     /// <summary>
@@ -95,7 +98,8 @@ public class BibleService
     }
 
     /// <summary>
-    /// Busca versículos que contengan un texto específico
+    /// Busca versículos que contengan un texto específico (case-insensitive y accent-insensitive)
+    /// Busca en el texto del versículo, nombre del libro y referencia
     /// </summary>
     public List<BibleSearchResult> SearchByText(string searchText, int maxResults = 50)
     {
@@ -103,13 +107,22 @@ public class BibleService
             return new List<BibleSearchResult>();
 
         var results = new List<BibleSearchResult>();
-        var searchLower = searchText.ToLowerInvariant();
+        var searchNormalized = RemoveAccents(searchText.ToLowerInvariant());
 
         foreach (var book in _bible.Books)
         {
+            var bookNameNormalized = RemoveAccents(book.Name.ToLowerInvariant());
+            
             foreach (var verse in book.Verses)
             {
-                if (verse.Text.ToLowerInvariant().Contains(searchLower))
+                var textNormalized = RemoveAccents(verse.Text.ToLowerInvariant());
+                var reference = $"{book.Name} {verse.Chapter}:{verse.Verse}";
+                var referenceNormalized = RemoveAccents(reference.ToLowerInvariant());
+
+                // Search in text, book name, or reference
+                if (textNormalized.Contains(searchNormalized) || 
+                    bookNameNormalized.Contains(searchNormalized) ||
+                    referenceNormalized.Contains(searchNormalized))
                 {
                     results.Add(new BibleSearchResult
                     {
@@ -126,6 +139,29 @@ public class BibleService
         }
 
         return results;
+    }
+
+    /// <summary>
+    /// Remueve los acentos de un texto para búsqueda normalizada
+    /// </summary>
+    private static string RemoveAccents(string text)
+    {
+        if (string.IsNullOrEmpty(text))
+            return text;
+
+        var normalizedString = text.Normalize(NormalizationForm.FormD);
+        var stringBuilder = new StringBuilder();
+
+        foreach (var c in normalizedString)
+        {
+            var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
+            if (unicodeCategory != UnicodeCategory.NonSpacingMark)
+            {
+                stringBuilder.Append(c);
+            }
+        }
+
+        return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
     }
 
     /// <summary>

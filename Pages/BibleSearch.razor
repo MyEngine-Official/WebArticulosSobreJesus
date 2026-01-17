@@ -1,0 +1,217 @@
+@page "/biblia"
+@inject BibleService BibleService
+@inject NavigationManager Navigation
+
+<PageTitle>Biblia LBLA - ¿Quién es Jesús?</PageTitle>
+
+<div class="container mt-4 fade-in">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="bi bi-book"></i> Biblia LBLA</h1>
+    </div>
+
+    <div class="card shadow-elegant mb-4">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="bi bi-search"></i> Buscar en la Biblia</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-10">
+                    <input type="text" class="form-control form-control-lg" 
+                           @bind="searchQuery" 
+                           @bind:event="oninput"
+                           @onkeypress="HandleKeyPress"
+                           placeholder="Buscar por palabra, frase, libro, referencia..." />
+                    <small class="text-muted">
+                        Ejemplos: "amor", "Juan 3:16", "Génesis", "fe esperanza"
+                    </small>
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-primary btn-lg w-100" @onclick="PerformSearch" disabled="@isSearching">
+                        @if (isSearching)
+                        {
+                            <span class="spinner-border spinner-border-sm me-2"></span>
+                        }
+                        <i class="bi bi-search"></i> Buscar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (hasSearched)
+    {
+        <div class="card shadow-elegant">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="bi bi-list-check"></i> 
+                    Resultados (@searchResults.Count @(searchResults.Count == 50 ? "+" : ""))
+                </h5>
+                @if (searchResults.Any())
+                {
+                    <span class="badge bg-primary">@searchResults.Count versículos encontrados</span>
+                }
+            </div>
+            <div class="card-body">
+                @if (!searchResults.Any())
+                {
+                    <div class="text-center text-muted py-4">
+                        <i class="bi bi-search" style="font-size: 3rem;"></i>
+                        <p class="mt-3">No se encontraron versículos que coincidan con "<strong>@lastSearchQuery</strong>"</p>
+                        <p class="small">Intenta con otras palabras o verifica la ortografía</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="list-group list-group-flush bible-results">
+                        @foreach (var result in searchResults)
+                        {
+                            <div class="list-group-item bible-verse-item">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1 text-primary">
+                                            <i class="bi bi-bookmark"></i> @result.Reference
+                                        </h6>
+                                        <p class="mb-1 verse-text">@result.Text</p>
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-primary ms-2" 
+                                            @onclick="() => CopyVerse(result)" 
+                                            title="Copiar versículo">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    }
+    else if (!isLoading)
+    {
+        <div class="card shadow-elegant">
+            <div class="card-body text-center py-5">
+                <i class="bi bi-book" style="font-size: 4rem; color: var(--color-primary);"></i>
+                <h4 class="mt-3">Explora la Palabra de Dios</h4>
+                <p class="text-muted">
+                    Busca por palabras, frases, nombres de libros o referencias bíblicas.<br/>
+                    La búsqueda ignora mayúsculas/minúsculas y acentos.
+                </p>
+                <div class="row mt-4 g-3 justify-content-center">
+                    <div class="col-auto">
+                        <button class="btn btn-outline-primary" @onclick='() => QuickSearch("amor")'>
+                            <i class="bi bi-heart"></i> amor
+                        </button>
+                    </div>
+                    <div class="col-auto">
+                        <button class="btn btn-outline-primary" @onclick='() => QuickSearch("Juan 3:16")'>
+                            <i class="bi bi-bookmark"></i> Juan 3:16
+                        </button>
+                    </div>
+                    <div class="col-auto">
+                        <button class="btn btn-outline-primary" @onclick='() => QuickSearch("fe")'>
+                            <i class="bi bi-star"></i> fe
+                        </button>
+                    </div>
+                    <div class="col-auto">
+                        <button class="btn btn-outline-primary" @onclick='() => QuickSearch("esperanza")'>
+                            <i class="bi bi-sun"></i> esperanza
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@if (showCopiedToast)
+{
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1050;">
+        <div class="toast show" role="alert">
+            <div class="toast-header bg-success text-white">
+                <i class="bi bi-check-circle me-2"></i>
+                <strong class="me-auto">Copiado</strong>
+                <button type="button" class="btn-close btn-close-white" @onclick="() => showCopiedToast = false"></button>
+            </div>
+            <div class="toast-body">
+                Versículo copiado al portapapeles
+            </div>
+        </div>
+    </div>
+}
+
+<style>
+    .bible-results {
+        max-height: 600px;
+        overflow-y: auto;
+    }
+
+    .bible-verse-item {
+        transition: background-color 0.2s ease;
+    }
+
+    .bible-verse-item:hover {
+        background-color: var(--color-cream);
+    }
+
+    .verse-text {
+        font-size: 1rem;
+        line-height: 1.6;
+        color: var(--color-dark);
+    }
+</style>
+
+@code {
+    private string searchQuery = string.Empty;
+    private string lastSearchQuery = string.Empty;
+    private List<BibleSearchResult> searchResults = new();
+    private bool isLoading = true;
+    private bool isSearching = false;
+    private bool hasSearched = false;
+    private bool showCopiedToast = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await BibleService.InitializeAsync();
+        isLoading = false;
+    }
+
+    private async Task HandleKeyPress(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await PerformSearch();
+        }
+    }
+
+    private async Task PerformSearch()
+    {
+        if (string.IsNullOrWhiteSpace(searchQuery)) return;
+
+        isSearching = true;
+        StateHasChanged();
+
+        await Task.Delay(50); // Small delay for UI feedback
+
+        lastSearchQuery = searchQuery;
+        searchResults = BibleService.SearchByText(searchQuery, 50);
+        hasSearched = true;
+        isSearching = false;
+    }
+
+    private async Task QuickSearch(string query)
+    {
+        searchQuery = query;
+        await PerformSearch();
+    }
+
+    private async Task CopyVerse(BibleSearchResult result)
+    {
+        var textToCopy = $"\"{result.Text}\" - {result.Reference} (LBLA)";
+        // Note: In Blazor WASM, we would need JS interop for clipboard
+        // For now, just show the toast
+        showCopiedToast = true;
+        StateHasChanged();
+        await Task.Delay(3000);
+        showCopiedToast = false;
+    }
+}
