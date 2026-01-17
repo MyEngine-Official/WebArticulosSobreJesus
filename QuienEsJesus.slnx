@@ -1,3 +1,4 @@
 <Solution>
   <Project Path="QuienEsJesus.csproj" />
+  <Project Path="QuienEsJesus.Maui/QuienEsJesus.Maui.csproj" />
 </Solution>

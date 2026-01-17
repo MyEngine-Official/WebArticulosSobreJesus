@@ -18,4 +18,12 @@
     <ServiceWorker Include="wwwroot\service-worker.js" PublishedContent="wwwroot\service-worker.published.js" />
   </ItemGroup>
 
+  <!-- Exclude MAUI project folder from compilation -->
+  <ItemGroup>
+    <Compile Remove="QuienEsJesus.Maui\**" />
+    <Content Remove="QuienEsJesus.Maui\**" />
+    <EmbeddedResource Remove="QuienEsJesus.Maui\**" />
+    <None Remove="QuienEsJesus.Maui\**" />
+  </ItemGroup>
+
 </Project>
