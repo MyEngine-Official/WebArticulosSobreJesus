@@ -6,6 +6,7 @@
 @using Markdig
 @using Microsoft.JSInterop
 @inject ArticleService ArticleService
+@inject BibleService BibleService
 @inject NavigationManager Navigation
 @inject IJSRuntime JSRuntime
 
@@ -129,6 +130,9 @@ else
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Contenido (Markdown)</h5>
                     <div class="btn-group btn-group-sm" role="group">
+                        <button type="button" class="btn btn-outline-primary" @onclick="OpenBibleSearch" title="Buscar en la Biblia">
+                            <i class="bi bi-journal-bookmark"></i>
+                        </button>
                         <button type="button" class="btn btn-outline-secondary" @onclick="@(() => InsertMarkdown("**", "**"))" title="Negrita">
                             <strong>B</strong>
                         </button>
@@ -188,6 +192,83 @@ else
         </EditForm>
     </div>
 
+    @* Bible Search Modal *@
+    @if (showBibleModal)
+    {
+        <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <i class="bi bi-journal-bookmark"></i> Buscar en la Biblia
+                        </h5>
+                        <button type="button" class="btn-close" @onclick="CloseBibleSearch"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" 
+                                   @bind="bibleSearchQuery" 
+                                   @bind:event="oninput"
+                                   @onkeypress="HandleBibleKeyPress"
+                                   placeholder="Buscar palabra, frase, referencia..." />
+                            <button class="btn btn-primary" type="button" @onclick="SearchBible" disabled="@isBibleSearching">
+                                @if (isBibleSearching)
+                                {
+                                    <span class="spinner-border spinner-border-sm"></span>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-search"></i>
+                                }
+                            </button>
+                        </div>
+                        <small class="text-muted d-block mb-3">
+                            La búsqueda ignora mayúsculas/minúsculas y acentos. Ej: "amor", "Juan 3:16", "Genesis"
+                        </small>
+
+                        @if (bibleSearchResults.Any())
+                        {
+                            <div class="list-group bible-modal-results">
+                                @foreach (var result in bibleSearchResults)
+                                {
+                                    <button type="button" class="list-group-item list-group-item-action" 
+                                            @onclick="() => SelectVerse(result)">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <h6 class="mb-1 text-primary">@result.Reference</h6>
+                                                <p class="mb-0 small">@result.Text</p>
+                                            </div>
+                                            <i class="bi bi-plus-circle text-success"></i>
+                                        </div>
+                                    </button>
+                                }
+                            </div>
+                        }
+                        else if (hasBibleSearched)
+                        {
+                            <div class="text-center text-muted py-4">
+                                <i class="bi bi-search" style="font-size: 2rem;"></i>
+                                <p class="mt-2">No se encontraron versículos</p>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-center text-muted py-4">
+                                <i class="bi bi-journal-bookmark" style="font-size: 2rem;"></i>
+                                <p class="mt-2">Busca un versículo para insertarlo como cita</p>
+                            </div>
+                        }
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @onclick="CloseBibleSearch">
+                            Cerrar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
     <style>
         .preview-content {
             max-height: 600px;
@@ -217,6 +298,11 @@ else
             font-family: 'Fira Code', 'Courier New', monospace;
             font-size: 0.95rem;
         }
+
+        .bible-modal-results {
+            max-height: 400px;
+            overflow-y: auto;
+        }
     </style>
 }
 
@@ -229,6 +315,13 @@ else
     private bool showPreview = true;
     private InputTextArea? contentTextArea;
 
+    // Bible search state
+    private bool showBibleModal = false;
+    private string bibleSearchQuery = string.Empty;
+    private List<BibleSearchResult> bibleSearchResults = new();
+    private bool isBibleSearching = false;
+    private bool hasBibleSearched = false;
+
     protected override async Task OnInitializedAsync()
     {
         // Redirigir si no está en modo debug
@@ -239,6 +332,7 @@ else
         }
 
         await ArticleService.InitializeAsync();
+        await BibleService.InitializeAsync();
         
         if (IsEditing)
         {
@@ -303,5 +397,49 @@ else
             .Build();
 
         return Markdown.ToHtml(markdown, pipeline);
+    }
+
+    // Bible search methods
+    private void OpenBibleSearch()
+    {
+        showBibleModal = true;
+        bibleSearchQuery = string.Empty;
+        bibleSearchResults.Clear();
+        hasBibleSearched = false;
+    }
+
+    private void CloseBibleSearch()
+    {
+        showBibleModal = false;
+    }
+
+    private async Task HandleBibleKeyPress(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await SearchBible();
+        }
+    }
+
+    private async Task SearchBible()
+    {
+        if (string.IsNullOrWhiteSpace(bibleSearchQuery)) return;
+
+        isBibleSearching = true;
+        StateHasChanged();
+
+        await Task.Delay(50); // Small delay for UI feedback
+
+        bibleSearchResults = BibleService.SearchByText(bibleSearchQuery, 50);
+        hasBibleSearched = true;
+        isBibleSearching = false;
+    }
+
+    private void SelectVerse(BibleSearchResult result)
+    {
+        // Insert as a blockquote with reference
+        var citation = $"\n\n> \"{result.Text}\"\n> — *{result.Reference} (LBLA)*\n\n";
+        article.Contenido += citation;
+        showBibleModal = false;
     }
 }
