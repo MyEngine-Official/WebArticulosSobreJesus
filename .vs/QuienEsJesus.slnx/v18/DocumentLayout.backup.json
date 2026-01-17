@@ -3,24 +3,12 @@
   "WorkspaceRootPath": "C:\\QuienEsJesus\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{901B12D1-9C69-FF78-BE02-4C0F6A02D863}|QuienEsJesus.csproj|c:\\quienesjesus\\pages\\home.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{901B12D1-9C69-FF78-BE02-4C0F6A02D863}|QuienEsJesus.csproj|solutionrelative:pages\\home.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{901B12D1-9C69-FF78-BE02-4C0F6A02D863}|QuienEsJesus.csproj|c:\\quienesjesus\\pages\\articleeditor.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{901B12D1-9C69-FF78-BE02-4C0F6A02D863}|QuienEsJesus.csproj|solutionrelative:pages\\articleeditor.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{901B12D1-9C69-FF78-BE02-4C0F6A02D863}|QuienEsJesus.csproj|c:\\quienesjesus\\layout\\mainlayout.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{901B12D1-9C69-FF78-BE02-4C0F6A02D863}|QuienEsJesus.csproj|solutionrelative:layout\\mainlayout.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{901B12D1-9C69-FF78-BE02-4C0F6A02D863}|QuienEsJesus.csproj|c:\\quienesjesus\\services\\bibleservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{901B12D1-9C69-FF78-BE02-4C0F6A02D863}|QuienEsJesus.csproj|solutionrelative:services\\bibleservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{901B12D1-9C69-FF78-BE02-4C0F6A02D863}|QuienEsJesus.csproj|c:\\quienesjesus\\services\\articleservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{901B12D1-9C69-FF78-BE02-4C0F6A02D863}|QuienEsJesus.csproj|solutionrelative:services\\articleservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{901B12D1-9C69-FF78-BE02-4C0F6A02D863}|QuienEsJesus.csproj|c:\\quienesjesus\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{901B12D1-9C69-FF78-BE02-4C0F6A02D863}|QuienEsJesus.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -30,7 +18,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 6,
+          "SelectedChildIndex": 4,
           "Children": [
             {
               "$type": "Bookmark",
@@ -50,20 +38,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "ArticleEditor.razor",
-              "DocumentMoniker": "C:\\QuienEsJesus\\Pages\\ArticleEditor.razor",
-              "RelativeDocumentMoniker": "Pages\\ArticleEditor.razor",
-              "ToolTip": "C:\\QuienEsJesus\\Pages\\ArticleEditor.razor",
-              "RelativeToolTip": "Pages\\ArticleEditor.razor",
-              "ViewState": "AgIAAGYAAAAAAAAAAAAAAEwAAABRAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-15T12:30:04.013Z",
+              "DocumentIndex": 0,
+              "Title": "BibleService.cs",
+              "DocumentMoniker": "C:\\QuienEsJesus\\Services\\BibleService.cs",
+              "RelativeDocumentMoniker": "Services\\BibleService.cs",
+              "ToolTip": "C:\\QuienEsJesus\\Services\\BibleService.cs",
+              "RelativeToolTip": "Services\\BibleService.cs",
+              "ViewState": "AgIAAGQAAAAAAAAAAAArwHcAAAAPAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-17T15:53:07.816Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 1,
               "Title": "ArticleService.cs",
               "DocumentMoniker": "C:\\QuienEsJesus\\Services\\ArticleService.cs",
               "RelativeDocumentMoniker": "Services\\ArticleService.cs",
@@ -71,45 +59,8 @@
               "RelativeToolTip": "Services\\ArticleService.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-15T12:06:35.226Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "Home.razor",
-              "DocumentMoniker": "C:\\QuienEsJesus\\Pages\\Home.razor",
-              "RelativeDocumentMoniker": "Pages\\Home.razor",
-              "ToolTip": "C:\\QuienEsJesus\\Pages\\Home.razor",
-              "RelativeToolTip": "Pages\\Home.razor",
-              "ViewState": "AgIAAK0BAAAAAAAAAAAgwLUBAAAGAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-15T03:02:10.255Z",
+              "WhenOpened": "2026-01-17T15:53:06.622Z",
               "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "MainLayout.razor",
-              "DocumentMoniker": "C:\\QuienEsJesus\\Layout\\MainLayout.razor",
-              "RelativeDocumentMoniker": "Layout\\MainLayout.razor",
-              "ToolTip": "C:\\QuienEsJesus\\Layout\\MainLayout.razor",
-              "RelativeToolTip": "Layout\\MainLayout.razor",
-              "ViewState": "AgIAACMAAAAAAAAAAAAQwE4AAAAZAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-15T03:01:54.104Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "Program.cs",
-              "DocumentMoniker": "C:\\QuienEsJesus\\Program.cs",
-              "RelativeDocumentMoniker": "Program.cs",
-              "ToolTip": "C:\\QuienEsJesus\\Program.cs",
-              "RelativeToolTip": "Program.cs",
-              "ViewState": "AgIAAAsAAAAAAAAAAAAQwBAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-15T02:59:27.143Z"
             }
           ]
         }

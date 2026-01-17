@@ -1,4 +1,4 @@
-using QuienEsJesus.Models;
+﻿using QuienEsJesus.Models;
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
@@ -106,30 +106,37 @@ public class BibleService
         if (_bible == null || string.IsNullOrWhiteSpace(searchText))
             return new List<BibleSearchResult>();
 
+        var results = new List<BibleSearchResult>();
         var searchNormalized = RemoveAccents(searchText.ToLowerInvariant());
 
-        // Usar PLINQ para búsqueda paralela eficiente
-        var results = _bible.Books
-            .AsParallel()
-            .SelectMany(book => book.Verses.Select(verse => new
+        Parallel.ForEach(_bible.Books, book =>
+        {
+            var bookNameNormalized = RemoveAccents(book.Name.ToLowerInvariant());
+
+            Parallel.ForEach(book.Verses, (verse) =>
             {
-                Book = book,
-                Verse = verse,
-                TextNormalized = RemoveAccents(verse.Text.ToLowerInvariant()),
-                Reference = $"{book.Name} {verse.Chapter}:{verse.Verse}"
-            }))
-            .Where(item =>
-                item.TextNormalized.Contains(searchNormalized) ||
-                RemoveAccents(item.Reference.ToLowerInvariant()).Contains(searchNormalized))
-            .Take(maxResults)
-            .Select(item => new BibleSearchResult
-            {
-                BookName = item.Book.Name,
-                Chapter = item.Verse.Chapter,
-                Verse = item.Verse.Verse,
-                Text = item.Verse.Text
-            })
-            .ToList();
+                var textNormalized = RemoveAccents(verse.Text.ToLowerInvariant());
+                var reference = $"{book.Name} {verse.Chapter}:{verse.Verse}";
+                var referenceNormalized = RemoveAccents(reference.ToLowerInvariant());
+
+                // Search in text, book name, or reference
+                if (textNormalized.Contains(searchNormalized) ||
+                    //bookNameNormalized.Contains(searchNormalized) ||
+                    referenceNormalized.Contains(searchNormalized))
+                {
+                    results.Add(new BibleSearchResult
+                    {
+                        BookName = book.Name,
+                        Chapter = verse.Chapter,
+                        Verse = verse.Verse,
+                        Text = verse.Text
+                    });
+
+                    //if (results.Count >= maxResults)
+                    //return results;
+                }
+            });
+        });
 
         return results;
     }
