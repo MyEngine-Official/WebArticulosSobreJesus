@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -16,6 +16,16 @@
 
   <ItemGroup>
     <ServiceWorker Include="wwwroot\service-worker.js" PublishedContent="wwwroot\service-worker.published.js" />
+  </ItemGroup>
+
+  <!-- Exclude MAUI project folder from compilation -->
+  <ItemGroup>
+   
+	  <Compile Remove="QuienEsJesus.Native\**" />
+	  <Content Remove="QuienEsJesus.Native\**" />
+	  <EmbeddedResource Remove="QuienEsJesus.Native\**"/>
+	  <None Remove="QuienEsJesus.Native\**" />
+
   </ItemGroup>
 
 </Project>

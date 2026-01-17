@@ -10,9 +10,12 @@ on:
       - main
       - develop
 
+permissions:
+  contents: read
+
 jobs:
-  build:
-    name: Build QuienEsJesus (.NET 10)
+  build-blazor:
+    name: Build QuienEsJesus Blazor (.NET 10)
     runs-on: ubuntu-latest
 
     steps:
@@ -37,3 +40,36 @@ jobs:
 
     - name: Build QuienEsJesus
       run: dotnet build QuienEsJesus.csproj --configuration Release --no-restore
+
+  build-maui:
+    name: Build QuienEsJesus MAUI (.NET 10)
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup .NET 10 (LTS)
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.x'
+
+    - name: Install MAUI Workload
+      run: dotnet workload install maui
+
+    - name: Cache NuGet packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-maui-${{ hashFiles('QuienEsJesus.Maui/*.csproj') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-maui-
+
+    - name: Restore QuienEsJesus.Maui
+      run: dotnet restore QuienEsJesus.Maui/QuienEsJesus.Maui.csproj
+
+    - name: Build QuienEsJesus.Maui (iOS)
+      run: dotnet build QuienEsJesus.Maui/QuienEsJesus.Maui.csproj --configuration Release --no-restore -f net10.0-ios
+
+    - name: Build QuienEsJesus.Maui (MacCatalyst)
+      run: dotnet build QuienEsJesus.Maui/QuienEsJesus.Maui.csproj --configuration Release --no-restore -f net10.0-maccatalyst

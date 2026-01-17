@@ -3,12 +3,16 @@
   "WorkspaceRootPath": "C:\\QuienEsJesus\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{901B12D1-9C69-FF78-BE02-4C0F6A02D863}|QuienEsJesus.csproj|c:\\quienesjesus\\services\\bibleservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{901B12D1-9C69-FF78-BE02-4C0F6A02D863}|QuienEsJesus.csproj|solutionrelative:services\\bibleservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{8CB0AC96-A0DB-4B94-93B2-8968884D1333}|QuienEsJesus.Native\\QuienEsJesus.Native.csproj|c:\\quienesjesus\\quienesjesus.native\\app.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8CB0AC96-A0DB-4B94-93B2-8968884D1333}|QuienEsJesus.Native\\QuienEsJesus.Native.csproj|solutionrelative:quienesjesus.native\\app.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{901B12D1-9C69-FF78-BE02-4C0F6A02D863}|QuienEsJesus.csproj|c:\\quienesjesus\\services\\articleservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{901B12D1-9C69-FF78-BE02-4C0F6A02D863}|QuienEsJesus.csproj|solutionrelative:services\\articleservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{8CB0AC96-A0DB-4B94-93B2-8968884D1333}|QuienEsJesus.Native\\QuienEsJesus.Native.csproj|c:\\quienesjesus\\quienesjesus.native\\mainpage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8CB0AC96-A0DB-4B94-93B2-8968884D1333}|QuienEsJesus.Native\\QuienEsJesus.Native.csproj|solutionrelative:quienesjesus.native\\mainpage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8CB0AC96-A0DB-4B94-93B2-8968884D1333}|QuienEsJesus.Native\\QuienEsJesus.Native.csproj|c:\\quienesjesus\\quienesjesus.native\\quienesjesus.native.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{8CB0AC96-A0DB-4B94-93B2-8968884D1333}|QuienEsJesus.Native\\QuienEsJesus.Native.csproj|solutionrelative:quienesjesus.native\\quienesjesus.native.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
     }
   ],
   "DocumentGroupContainers": [
@@ -39,27 +43,40 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "BibleService.cs",
-              "DocumentMoniker": "C:\\QuienEsJesus\\Services\\BibleService.cs",
-              "RelativeDocumentMoniker": "Services\\BibleService.cs",
-              "ToolTip": "C:\\QuienEsJesus\\Services\\BibleService.cs",
-              "RelativeToolTip": "Services\\BibleService.cs",
-              "ViewState": "AgIAAGQAAAAAAAAAAAArwHcAAAAPAAAAAAAAAA==",
+              "Title": "App.xaml.cs",
+              "DocumentMoniker": "C:\\QuienEsJesus\\QuienEsJesus.Native\\App.xaml.cs",
+              "RelativeDocumentMoniker": "QuienEsJesus.Native\\App.xaml.cs",
+              "ToolTip": "C:\\QuienEsJesus\\QuienEsJesus.Native\\App.xaml.cs",
+              "RelativeToolTip": "QuienEsJesus.Native\\App.xaml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAqAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-17T15:53:07.816Z",
+              "WhenOpened": "2026-01-17T17:45:26.695Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "ArticleService.cs",
-              "DocumentMoniker": "C:\\QuienEsJesus\\Services\\ArticleService.cs",
-              "RelativeDocumentMoniker": "Services\\ArticleService.cs",
-              "ToolTip": "C:\\QuienEsJesus\\Services\\ArticleService.cs",
-              "RelativeToolTip": "Services\\ArticleService.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Title": "MainPage.xaml.cs",
+              "DocumentMoniker": "C:\\QuienEsJesus\\QuienEsJesus.Native\\MainPage.xaml.cs",
+              "RelativeDocumentMoniker": "QuienEsJesus.Native\\MainPage.xaml.cs",
+              "ToolTip": "C:\\QuienEsJesus\\QuienEsJesus.Native\\MainPage.xaml.cs",
+              "RelativeToolTip": "QuienEsJesus.Native\\MainPage.xaml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAZAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-17T15:53:06.622Z",
+              "WhenOpened": "2026-01-17T17:39:14.619Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "QuienEsJesus.Native",
+              "DocumentMoniker": "C:\\QuienEsJesus\\QuienEsJesus.Native\\QuienEsJesus.Native.csproj",
+              "RelativeDocumentMoniker": "QuienEsJesus.Native\\QuienEsJesus.Native.csproj",
+              "ToolTip": "C:\\QuienEsJesus\\QuienEsJesus.Native\\QuienEsJesus.Native.csproj",
+              "RelativeToolTip": "QuienEsJesus.Native\\QuienEsJesus.Native.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAApAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2026-01-17T17:39:02.064Z",
               "EditorCaption": ""
             }
           ]

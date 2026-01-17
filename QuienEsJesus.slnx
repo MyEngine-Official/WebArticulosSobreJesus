@@ -1,3 +1,6 @@
 <Solution>
   <Project Path="QuienEsJesus.csproj" />
+  <Project Path="QuienEsJesus.Native/QuienEsJesus.Native.csproj" Id="8cb0ac96-a0db-4b94-93b2-8968884d1333">
+    <Deploy Solution="Debug|*" />
+  </Project>
 </Solution>
